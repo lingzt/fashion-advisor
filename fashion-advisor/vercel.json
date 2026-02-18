@@ -21,6 +21,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/fashion-advisor/(.*)", "destination": "/$1" }
+    { "source": "/fashion-advisor/:match*", "destination": "/:match*" }
   ]
 }
