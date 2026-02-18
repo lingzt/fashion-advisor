@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Fashion Color Filter & Annotator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .save-btn {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .save-btn:hover { background: #218838; }
+        
+        .save-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 8px 16px;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .filter-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .filter-label {
+            font-weight: bold;
+            color: #555;
+            min-width: 80px;
+        }
+        
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .color-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 2px solid #ddd;
+            border-radius: 18px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        
+        .color-btn:hover { border-color: #888; }
+        
+        .color-btn.selected {
+            border-color: #333;
+            background: #f0f0f0;
+        }
+        
+        .color-swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .color-btn[data-color="white"] .color-swatch { background: #f8f8f8; }
+        .color-btn[data-color="black"] .color-swatch { background: #222; }
+        .color-btn[data-color="gray"] .color-swatch { background: #888; }
+        .color-btn[data-color="brown"] .color-swatch { background: #8B4513; }
+        .color-btn[data-color="blue"] .color-swatch { background: #4169E1; }
+        .color-btn[data-color="red"] .color-swatch { background: #DC143C; }
+        .color-btn[data-color="green"] .color-swatch { background: #228B22; }
+        .color-btn[data-color="purple"] .color-swatch { background: #9370DB; }
+        .color-btn[data-color="yellow"] .color-swatch { background: #FFD700; }
+        .color-btn[data-color="pink"] .color-swatch { background: #FFB6C1; }
+        .color-btn[data-color="orange"] .color-swatch { background: #FF8C00; }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .search-box button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .results-info {
+            text-align: center;
+            color: #666;
+            margin: 15px 0;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        
+        .gallery-item {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .gallery-item.corrected {
+            border: 3px solid #28a745;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        
+        .gallery-item .info {
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .color-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .color-tag.auto {
+            background: #e9ecef;
+            color: #666;
+        }
+        
+        .color-tag.corrected {
+            background: #28a745;
+            color: white;
+        }
+        
+        .gallery-item .correct-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #28a745;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .gallery-item.corrected .correct-badge {
+            display: flex;
+        }
+        
+        /* Modal for color selection */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .modal h3 { margin-bottom: 15px; }
+        
+        .modal-colors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-color-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 3px solid #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-color-btn:hover { border-color: #333; }
+        
+        .modal-color-btn.selected {
+            border-color: #28a745;
+            transform: scale(1.1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .modal-btn.cancel { background: #dc3545; color: white; }
+        .modal-btn.save { background: #28a745; color: white; }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <h1>🎨 Fashion Color Filter & Annotator</h1>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span class="status" id="status">No changes</span>
+                <button class="save-btn" id="saveBtn" onclick="saveCorrections()" disabled>💾 Save</button>
+                <button class="save-btn" id="applyBtn" onclick="applyCorrections()" style="background: #17a2b8;" disabled>🔄 Apply & Restart</button>
+            </div>
+        </div>
+        
+        <div class="filter-panel">
+            <div class="filter-row">
+                <span class="filter-label">Filter:</span>
+                <div class="color-options" id="colorOptions"></div>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search items... (e.g., 'dress', 'coat', 'shirt')">
+                <button onclick="search()">🔍 Search</button>
+                <button onclick="resetFilter()" style="background: #6c757d;">Reset</button>
+            </div>
+        </div>
+        
+        <div class="results-info" id="resultsInfo"></div>
+        
+        <div class="gallery" id="gallery"></div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="correctedCount">0</div>
+                <div class="stat-label">Corrected</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="remainingCount">0</div>
+                <div class="stat-label">Remaining</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Color Selection Modal -->
+    <div class="modal" id="colorModal">
+        <div class="modal-content">
+            <h3>Select Correct Color</h3>
+            <div class="modal-colors" id="modalColors"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn save" onclick="confirmCorrection()">✓ Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const COLORS = [
+            { id: 'white', name: 'White' },
+            { id: 'black', name: 'Black' },
+            { id: 'gray', name: 'Gray' },
+            { id: 'brown', name: 'Brown' },
+            { id: 'blue', name: 'Blue' },
+            { id: 'red', name: 'Red' },
+            { id: 'green', name: 'Green' },
+            { id: 'purple', name: 'Purple' },
+            { id: 'yellow', name: 'Yellow' },
+            { id: 'pink', name: 'Pink' },
+            { id: 'orange', name: 'Orange' }
+        ];
+        
+        let selectedColors = [];
+        let allImages = [];
+        let filteredImages = [];
+        let corrections = {};
+        let selectedImage = null;
+        
+        // Initialize
+        initColorButtons();
+        initModalColors();
+        loadImages();
+        
+        function initColorButtons() {
+            const container = document.getElementById('colorOptions');
+            COLORS.forEach(color => {
+                const btn = document.createElement('div');
+                btn.className = 'color-btn';
+                btn.dataset.color = color.id;
+                btn.innerHTML = `
+                    <div class="color-swatch"></div>
+                    <span>${color.name}</span>
+                `;
+                btn.onclick = () => toggleColor(color.id);
+                container.appendChild(btn);
+            });
+        }
+        
+        function initModalColors() {
+            const container = document.getElementById('modalColors');
+            COLORS.forEach(color => {
+                const btn = document.createElement('div');
+                btn.className = 'modal-color-btn';
+                btn.dataset.color = color.id;
+                btn.style.background = getColorBg(color.id);
+                btn.onclick = () => selectModalColor(color.id);
+                container.appendChild(btn);
+            });
+        }
+        
+        function toggleColor(colorId) {
+            const btn = document.querySelector(`.color-btn[data-color="${colorId}"]`);
+            
+            if (selectedColors.includes(colorId)) {
+                selectedColors = selectedColors.filter(c => c !== colorId);
+                btn.classList.remove('selected');
+            } else {
+                selectedColors.push(colorId);
+                btn.classList.add('selected');
+            }
+            
+            filterAndDisplay();
+        }
+        
+        async function loadImages() {
+            try {
+                const response = await fetch('/api/images');
+                const data = await response.json();
+                allImages = data.images || [];
+                loadCorrections();
+                filterAndDisplay();
+            } catch (err) {
+                console.error('Error loading images:', err);
+            }
+        }
+        
+        function loadCorrections() {
+            try {
+                const saved = localStorage.getItem('colorCorrections');
+                if (saved) {
+                    corrections = JSON.parse(saved);
+                    updateStatus();
+                }
+            } catch (e) {
+                corrections = {};
+            }
+        }
+        
+        function saveCorrections() {
+            localStorage.setItem('colorCorrections', JSON.stringify(corrections));
+            
+            // Also save to server
+            fetch('/api/save-corrections', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ corrections })
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    alert('✓ Corrections saved successfully!');
+                    updateStatus();
+                } else {
+                    alert('Error saving: ' + (data.error || 'Unknown error'));
+                }
+            }).catch(err => {
+                alert('Error saving: ' + err);
+            });
+        }
+        
+        function filterAndDisplay() {
+            filteredImages = allImages;
+            
+            // Filter by selected colors
+            if (selectedColors.length > 0) {
+                filteredImages = allImages.filter(img => {
+                    const displayColor = corrections[img.image_id] || img.color;
+                    return selectedColors.includes(displayColor);
+                });
+            }
+            
+            displayImages(filteredImages);
+            updateStats();
+        }
+        
+        function search() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (!query) {
+                filterAndDisplay();
+                return;
+            }
+            
+            filteredImages = allImages.filter(img => {
+                const desc = (img.description || '').toLowerCase();
+                const displayColor = corrections[img.image_id] || img.color;
+                return desc.includes(query) || displayColor.includes(query);
+            });
+            
+            displayImages(filteredImages);
+            updateStats();
+        }
+        
+        function resetFilter() {
+            document.getElementById('searchInput').value = '';
+            selectedColors = [];
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+            filterAndDisplay();
+        }
+        
+        function displayImages(images) {
+            const gallery = document.getElementById('gallery');
+            const info = document.getElementById('resultsInfo');
+            
+            if (images.length === 0) {
+                gallery.innerHTML = '';
+                info.textContent = 'No images found';
+                return;
+            }
+            
+            info.textContent = `Showing ${images.length} images`;
+            
+            gallery.innerHTML = images.map(img => {
+                const corrected = corrections[img.image_id];
+                const displayColor = corrected || img.color;
+                return `
+                    <div class="gallery-item ${corrected ? 'corrected' : ''}" 
+                         onclick="openCorrectionModal('${img.image_id}', '${img.color}', '${img.file_path}')">
+                        <img src="/${img.file_path}" alt="Fashion item">
+                        <div class="correct-badge">✓</div>
+                        <div class="info">
+                            <span class="color-tag ${corrected ? 'corrected' : 'auto'}">${displayColor}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function openCorrectionModal(imageId, oldColor, filePath) {
+            selectedImage = { imageId, oldColor, filePath };
+            
+            // Highlight current color in modal
+            document.querySelectorAll('.modal-color-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.color === oldColor) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('colorModal').classList.add('active');
+        }
+        
+        function selectModalColor(colorId) {
+            document.querySelectorAll('.modal-color-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`.modal-color-btn[data-color="${colorId}"]`).classList.add('selected');
+        }
+        
+        function closeModal() {
+            document.getElementById('colorModal').classList.remove('active');
+            selectedImage = null;
+        }
+        
+        function confirmCorrection() {
+            if (!selectedImage) return;
+            
+            const selectedBtn = document.querySelector('.modal-color-btn.selected');
+            if (!selectedBtn) return;
+            
+            const newColor = selectedBtn.dataset.color;
+            corrections[selectedImage.imageId] = newColor;
+            
+            // Update local storage
+            localStorage.setItem('colorCorrections', JSON.stringify(corrections));
+            
+                updateStatus();
+            closeModal();
+        }
+        
+        function updateStatus() {
+            const count = Object.keys(corrections).length;
+            const saveBtn = document.getElementById('saveBtn');
+            const applyBtn = document.getElementById('applyBtn');
+            const status = document.getElementById('status');
+            
+            if (count > 0) {
+                saveBtn.disabled = false;
+                applyBtn.disabled = false;
+                status.textContent = `${count} correction${count > 1 ? 's' : ''} pending`;
+                status.style.background = '#fff3cd';
+            } else {
+                saveBtn.disabled = true;
+                applyBtn.disabled = true;
+                status.textContent = 'No changes';
+                status.style.background = '#e9ecef';
+            }
+        }
+        
+        async function applyCorrections() {
+            if (!confirm('Apply all corrections and restart server?')) return;
+            
+            try {
+                // First save to server
+                await fetch('/api/save-corrections', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ corrections })
+                });
+                
+                // Then apply and restart
+                const response = await fetch('/api/apply-corrections');
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✓ Applied ${data.corrected} corrections! Server restarting...`);
+                    // Reload page after delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown'));
+                }
+            } catch (err) {
+                alert('Error: ' + err);
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').textContent = filteredImages.length;
+            document.getElementById('correctedCount').textContent = 
+                filteredImages.filter(img => corrections[img.image_id]).length;
+            document.getElementById('remainingCount').textContent = 
+                filteredImages.length - filteredImages.filter(img => corrections[img.image_id]).length;
+        }
+        
+        function getColorBg(color) {
+            const colors = {
+                white: '#f8f8f8',
+                black: '#222',
+                gray: '#888',
+                brown: '#8B4513',
+                blue: '#4169E1',
+                red: '#DC143C',
+                green: '#228B22',
+                purple: '#9370DB',
+                yellow: '#FFD700',
+                pink: '#FFB6C1',
+                orange: '#FF8C00'
+            };
+            return colors[color] || '#999';
+        }
+    </script>
+</body>
+</html>

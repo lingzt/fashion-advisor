@@ -1,0 +1,240 @@
+# Fashionpedia Taxonomy
+## Hierarchical Fashion Metadata System
+
+```
+FASHION_CATEGORIES
+│
+├── TOP
+│   ├── TOPS
+│   │   ├── TSHIRT
+│   │   ├── SHIRT
+│   │   ├── BLOUSE
+│   │   ├── SWEATER
+│   │   ├── HOODIE
+│   │   ├── JACKET
+│   │   │   ├── DENIM_JACKET
+│   │   │   ├── LEATHER_JACKET
+│   │   │   ├── BOMBER_JACKET
+│   │   │   └── WINDBREAKER
+│   │   └── COAT
+│   │       ├── TRENCH_COAT
+│   │       ├── WOOL_COAT
+│   │       └── PARKAS
+│   │
+│   └── ATTRIBUTES
+│       ├── LENGTH
+│       │   ├── CROPPED
+│       │   ├── REGULAR
+│       │   └── LONG
+│       ├── NECKLINE
+│       │   ├── CREW
+│       │   ├── V_NECK
+│       │   ├── SQUARE
+│       │   ├── ROUND
+│       │   └── OFF_SHOULDER
+│       └── SLEEVE
+│           ├── SLEEVELESS
+│           ├── SHORT_SLEEVE
+│           ├── LONG_SLEEVE
+│           └── THREE_QUARTER
+│
+├── BOTTOM
+│   ├── PANTS
+│   │   ├── JEANS
+│   │   │   ├── SKINNY
+│   │   │   ├── STRAIGHT
+│   │   │   ├── BOOTCUT
+│   │   │   └── WIDE_LEG
+│   │   ├── TROUSERS
+│   │   │   ├── DRESS_PANTS
+│   │   │   └── CASUAL_PANTS
+│   │   ├── CHINOS
+│   │   └── CARGO_PANTS
+│   │
+│   ├── SHORTS
+│   │   ├── DENIM_SHORTS
+│   │   ├── CASUAL_SHORTS
+│   │   └── BOARD_SHORTS
+│   │
+│   ├── SKIRTS
+│   │   ├── MINI_SKIRT
+│   │   ├── MIDI_SKIRT
+│   │   ├── MAXI_SKIRT
+│   │   └── PLEATED_SKIRT
+│   │
+│   └── ATTRIBUTES
+│       ├── RISE
+│       │   ├── HIGH_RISE
+│       │   ├── MID_RISE
+│       │   └── LOW_RISE
+│       ├── FIT
+│       │   ├── SLIM
+│       │   ├── REGULAR
+│       │   ├── RELAXED
+│       │   └── OVERSIZE
+│       └── PATTERN
+│           ├── SOLID
+│           ├── STRIPED
+│           ├── CHECKERED
+│           └── PRINTED
+│
+├── FOOTWEAR
+│   ├── SNEAKERS
+│   │   ├── LOW_TOP
+│   │   ├── HIGH_TOP
+│   │   └── SLIP_ON
+│   │
+│   ├── DRESS_SHOES
+│   │   ├── LOAFERS
+│   │   ├── OXFORDS
+│   │   ├── DERBIES
+│   │   └── MONK_STRAP
+│   │
+│   ├── BOOTS
+│   │   ├── ANKLE_BOOTS
+│   │   ├── MID_BOOTS
+│   │   └── CHELSEA_BOOTS
+│   │
+│   ├── SANDALS
+│   │   ├── FLAT_SANDALS
+│   │   ├── HEEL_SANDALS
+│   │   └── SLIDES
+│   │
+│   └── ATTRIBUTES
+│       ├── HEEL_HEIGHT
+│       │   ├── FLAT
+│       │   ├── LOW (1-2")
+│       │   ├── MEDIUM (2-4")
+│       │   └── HIGH (4"+)
+│       └── MATERIAL
+│           ├── LEATHER
+│           ├── SUEDE
+│           ├── CANVAS
+│           └── SYNTHETIC
+│
+├── ACCESSORIES
+│   ├── BAGS
+│   │   ├── TOTE_BAG
+│   │   ├── SHOULDER_BAG
+│   │   ├── CROSSBODY_BAG
+│   │   ├── BACKPACK
+│   │   └── CLUTCH
+│   │
+│   ├── JEWELRY
+│   │   ├── NECKLACE
+│   │   ├── EARRINGS
+│   │   ├── BRACELET
+│   │   └── RING
+│   │
+│   ├── HATS
+│   │   ├── CAP
+│   │   ├── BEANIE
+│   │   ├── SUN_HAT
+│   │   └── FEDORA
+│   │
+│   ├── SCARVES
+│   │   ├── SILK_SCARF
+│   │   ├── WOOL_SCARF
+│   │   └── CASHMERE_SCARF
+│   │
+│   └── SUNGLASSES
+│       ├── AVIATOR
+│       ├── WAYFARER
+│       ├── ROUND
+│       └── CAT_EYE
+│
+└── OUTERWEAR [See TOPS for structure]
+```
+
+## Color System
+
+```
+COLOR_PALETTE
+│
+├── NEUTRAL
+│   ├── BLACK      #000000
+│   ├── WHITE      #FFFFFF
+│   ├── GRAY       #808080
+│   ├── BEIGE      #F5F5DC
+│   ├── CAMEL       #C19A6B
+│   ├── NAVY        #000080
+│   └── BROWN       #8B4513
+│
+├── WARM
+│   ├── RED        #FF0000
+│   ├── ORANGE     #FFA500
+│   ├── CORAL      #FF7F50
+│   ├── PEACH      #FFE5B4
+│   ├── YELLOW     #FFFF00
+│   └── GOLD       #FFD700
+│
+├── COOL
+│   ├── BLUE       #0000FF
+│   ├── TEAL       #008080
+│   ├── TURQUOISE  #40E0D0
+│   ├── COBALT     #0047AB
+│   └── INDIGO      #4B0082
+│
+├── PASTEL
+│   ├── PINK       #FFB6C1
+│   ├── LAVENDER   #E6E6FA
+│   ├── MINT       #98FF98
+│   ├── PEACH      #FFE5B4
+│   ├── BABY_BLUE  #89CFF0
+│   └── LILAC      #C8A2C8
+│
+└── EARTH_TONE
+    ├── OLIVE      #808000
+    ├── MOSS        #8A9A5B
+    ├── TERRA_COTTA #E2725B
+    ├── BURGUNDY    #800020
+    ├── WINE        #722F37
+    └── MUSTARD     #FFDB58
+```
+
+## Style Categories
+
+```
+STYLE_TAXONOMY
+│
+├── CASUAL
+│   ├── STREETWEAR
+│   ├── ATHLETIC
+│   ├── MINIMALIST
+│   └── GRUNGE
+│
+├── FORMAL
+│   ├── CLASSIC
+│   ├── BUSINESS
+│   ├── BLACK_TIE
+│   └── COCKTAIL
+│
+├── TRENDY
+│   ├── Y2K
+│   ├── BOHO_CHIC
+│   ├── PREPPY
+│   └── AVANT_GARDE
+│
+└── SPECIALTY
+    ├── VINTAGE
+    ├── ETHNIC
+    ├── GOTHIC
+    └── COUTURE
+```
+
+## Season/Occasion Matrix
+
+```
+SEASON × OCCASION
+                    CASUAL    WORK    DATE    PARTY    SPORT
+    ┌───────────────�─────────�────────�────────�────────�────────┐
+SPRING│   Light layers, pastels,           ✓        ✓        ✓
+      │   medium weight fabrics
+SUMMER│   Light colors, breathable         ✓        ✓        ✓
+      │   fabrics, shorts
+  FALL│   Earth tones, layers,             ✓        ✓        ✓
+      │   medium weight
+WINTER│   Dark colors, heavy              ✓        ✓        ✓
+      │   layers, warm fabrics
+    └───────────────┴─────────┴────────┴────────┴────────┘
+```

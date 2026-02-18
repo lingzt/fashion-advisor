@@ -1,0 +1,115 @@
+{
+  "outfit_id": "OUTFIT_spring_date",
+  "season": "spring",
+  "occasion": "date",
+  "style": "casual",
+  "compatibility_score": 0.85,
+  "layers": {
+    "base_layer": {
+      "item_id": "TOP001",
+      "name": "Classic White Tee",
+      "category": "TOP",
+      "subcategory": "TSHIRT",
+      "color": "#FFFFFF",
+      "color_family": null,
+      "season": "all",
+      "occasions": [
+        "casual",
+        "date"
+      ],
+      "styles": [
+        "casual"
+      ],
+      "formality_level": 1,
+      "warmth_level": 1,
+      "image_url": null,
+      "price": null,
+      "brand": null,
+      "score": 1.0
+    },
+    "middle_layer": null,
+    "outerwear": null,
+    "bottom": {
+      "item_id": "BOTTOM001",
+      "name": "Blue Straight Jeans",
+      "category": "BOTTOM",
+      "subcategory": "JEANS",
+      "color": "#0000FF",
+      "color_family": null,
+      "season": "all",
+      "occasions": [
+        "casual",
+        "date"
+      ],
+      "styles": [
+        "casual"
+      ],
+      "formality_level": 2,
+      "warmth_level": 2,
+      "image_url": null,
+      "price": null,
+      "brand": null,
+      "score": 1.0
+    },
+    "footwear": null,
+    "accessories": []
+  },
+  "items": [
+    {
+      "item_id": "TOP001",
+      "name": "Classic White Tee",
+      "category": "TOP",
+      "subcategory": "TSHIRT",
+      "color": "#FFFFFF",
+      "color_family": null,
+      "season": "all",
+      "occasions": [
+        "casual",
+        "date"
+      ],
+      "styles": [
+        "casual"
+      ],
+      "formality_level": 1,
+      "warmth_level": 1,
+      "image_url": null,
+      "price": null,
+      "brand": null,
+      "score": 1.0
+    },
+    {
+      "item_id": "BOTTOM001",
+      "name": "Blue Straight Jeans",
+      "category": "BOTTOM",
+      "subcategory": "JEANS",
+      "color": "#0000FF",
+      "color_family": null,
+      "season": "all",
+      "occasions": [
+        "casual",
+        "date"
+      ],
+      "styles": [
+        "casual"
+      ],
+      "formality_level": 2,
+      "warmth_level": 2,
+      "image_url": null,
+      "price": null,
+      "brand": null,
+      "score": 1.0
+    }
+  ],
+  "color_palette": [
+    "#FFFFFF",
+    "#0000FF"
+  ],
+  "style_tags": [
+    "casual"
+  ],
+  "recommendations": [
+    "Perfect for spring! Light layers work beautifully.",
+    "Put-together yet approachable - perfect for a date!",
+    "Color palette is harmoniously coordinated."
+  ]
+}

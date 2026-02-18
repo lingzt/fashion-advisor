@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👗 Fashion Stylist - Fashionpedia RAG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.active {
+            display: block;
+        }
+        
+        .profile-tags {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .profile-tag {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .profile-tag label {
+            display: block;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .profile-tag span {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .suggestion-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 25px;
+            border-radius: 15px;
+            line-height: 1.8;
+        }
+        
+        .suggestion-box ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        
+        .highlight {
+            background: rgba(255,255,255,0.5);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        
+        .gallery-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+        
+        .gallery-item .info {
+            padding: 15px;
+        }
+        
+        .gallery-item .info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .tech-stack {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+        }
+        
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👗 Fashion Stylist</h1>
+            <p>Fashionpedia + RAG Intelligent Recommendation</p>
+        </header>
+        
+        <!-- Input Form -->
+        <div class="card">
+            <h2>📝 Tell Us About Your Needs</h2>
+            <form id="fashionForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="text" id="age" placeholder="e.g., 41 years old" value="41 years old">
+                    </div>
+                    <div class="form-group">
+                        <label>Identity</label>
+                        <input type="text" id="identity" placeholder="e.g., SDE" value="SDE">
+                    </div>
+                    <div class="form-group">
+                        <label>Family</label>
+                        <input type="text" id="family" placeholder="e.g., married, not kids, 2 cats" value="married, not kids, 2 cats">
+                    </div>
+                    <div class="form-group">
+                        <label>Occasion</label>
+                        <select id="occasion">
+                            <option value="Wedding" selected>Wedding</option>
+                            <option value="Party">Party</option>
+                            <option value="Work">Work</option>
+                            <option value="Daily">Daily</option>
+                            <option value="Date">Date</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Theme</label>
+                        <input type="text" id="theme" placeholder="e.g., None" value="None">
+                    </div>
+                    <div class="form-group">
+                        <label>Style</label>
+                        <select id="style">
+                            <option value="Elegant" selected>Elegant</option>
+                            <option value="Minimal">Minimal</option>
+                            <option value="Trendy">Trendy</option>
+                            <option value="Conservative">Conservative</option>
+                            <option value="Personal">Personal</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Special Needs</label>
+                        <textarea id="special_needs" rows="3">The wedding is for Indian and American mix couple. The groom is my neighbor's children. I am Asian and about 5ft tall.</textarea>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">✨ Get Styling Advice</button>
+            </form>
+        </div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>🔍 Analyzing your needs...</p>
+            <p>🖼️ Finding relevant images from Fashionpedia...</p>
+            <p>🤖 Generating personalized styling advice...</p>
+        </div>
+        
+        <!-- Error Message -->
+        <div class="error-message" id="error" style="display:none;"></div>
+        
+        <!-- Results -->
+        <div class="result-section" id="result">
+            <!-- User Profile -->
+            <div class="card">
+                <h2>👤 User Profile</h2>
+                <div class="profile-tags" id="profileDisplay"></div>
+            </div>
+            
+            <!-- Styling Advice -->
+            <div class="card">
+                <h2>💬 Styling Advice</h2>
+                <div class="suggestion-box" id="suggestionDisplay"></div>
+            </div>
+            
+            <!-- Gallery -->
+            <div class="card">
+                <h2>🖼️ Recommended Outfits</h2>
+                <div class="gallery" id="galleryDisplay"></div>
+            </div>
+        </div>
+        
+        <div class="tech-stack">
+            <p>🔧 Tech Stack: Fashionpedia + ChromaDB + OpenAI Embeddings + GPT-3.5</p>
+            <p>💰 POC Cost: GPT-3.5 is ~90% cheaper than GPT-4</p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('fashionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('result').classList.remove('active');
+            document.getElementById('error').style.display = 'none';
+            
+            // Get form data
+            const formData = {
+                age: document.getElementById('age').value,
+                identity: document.getElementById('identity').value,
+                family: document.getElementById('family').value,
+                occasion: document.getElementById('occasion').value,
+                theme: document.getElementById('theme').value,
+                style: document.getElementById('style').value,
+                special_needs: document.getElementById('special_needs').value
+            };
+            
+            try {
+                // Call API
+                const response = await fetch('/api/recommend', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show results
+                    showResults(data.result);
+                } else {
+                    document.getElementById('error').textContent = 'Error: ' + data.error;
+                    document.getElementById('error').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('error').textContent = 'Connection error. Make sure the server is running.';
+                document.getElementById('error').style.display = 'block';
+            }
+            
+            document.getElementById('loading').classList.remove('active');
+        });
+        
+        function showResults(result) {
+            document.getElementById('result').classList.add('active');
+            
+            // Show profile
+            const profileHTML = `
+                <div class="profile-tag"><label>Age</label><span>${document.getElementById('age').value}</span></div>
+                <div class="profile-tag"><label>Identity</label><span>${document.getElementById('identity').value}</span></div>
+                <div class="profile-tag"><label>Family</label><span>${document.getElementById('family').value}</span></div>
+                <div class="profile-tag"><label>Occasion</label><span>${document.getElementById('occasion').value}</span></div>
+                <div class="profile-tag"><label>Theme</label><span>${document.getElementById('theme').value}</span></div>
+                <div class="profile-tag"><label>Style</label><span>${document.getElementById('style').value}</span></div>
+                <div class="profile-tag" style="grid-column: 1 / -1;"><label>Special Needs</label><span>${document.getElementById('special_needs').value}</span></div>
+            `;
+            document.getElementById('profileDisplay').innerHTML = profileHTML;
+            
+            // Show advice
+            document.getElementById('suggestionDisplay').innerHTML = '<div style="white-space: pre-line;">' + result.advice + '</div>';
+            
+            // Show images
+            let galleryHTML = '';
+            result.images.forEach((img, index) => {
+                galleryHTML += `
+                    <div class="gallery-item">
+                        <img src="${img.file_path}" alt="Outfit ${index+1}" 
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22280%22 height=%22280%22><rect fill=%22%23f0f0f0%22 width=%22280%22 height=%22280%22/><text fill=%22%23999%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22>Image ${index+1}</text></svg>'">
+                        <div class="info">
+                            <h3>Outfit ${index+1}</h3>
+                            <p>${img.description.substring(0, 60)}...</p>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('galleryDisplay').innerHTML = galleryHTML;
+            
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

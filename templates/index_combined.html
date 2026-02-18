@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👗 Fashion RAG - Multi-Database</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; color: white; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 20px; }
+        .card { background: white; color: #333; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .card h2 { color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-weight: 600; color: #555; margin-bottom: 5px; font-size: 0.9em; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 15px 30px; font-size: 1.1em; border-radius: 30px; cursor: pointer; display: block; width: 100%; margin-top: 15px; }
+        .loading { display: none; text-align: center; padding: 40px; color: white; }
+        .loading.active { display: block; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .result-section { display: none; }
+        .result-section.active { display: block; }
+        .profile-tags { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .profile-tag { background: linear-gradient(135deg, #f5f7fa, #c3cfe2); padding: 12px; border-radius: 10px; text-align: center; }
+        .profile-tag label { display: block; font-size: 0.8em; color: #666; }
+        .profile-tag span { font-weight: bold; color: #333; }
+        .db-section { margin: 20px 0; padding: 20px; border-radius: 15px; }
+        .db-section.fashionpedia { background: linear-gradient(135deg, #e0c3fc, #8ec5fc); }
+        .db-section.deepfashion2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .db-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .db-icon { font-size: 2em; }
+        .db-title { font-size: 1.3em; color: #333; font-weight: bold; }
+        .db-desc { font-size: 0.9em; color: #666; margin-bottom: 10px; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+        .gallery-item { background: white; border-radius: 10px; overflow: hidden; }
+        .gallery-item img { width: 100%; height: 180px; object-fit: cover; }
+        .gallery-item .info { padding: 10px; }
+        .gallery-item .info h4 { font-size: 0.9em; color: #333; margin-bottom: 5px; }
+        .gallery-item .info p { font-size: 0.8em; color: #666; }
+        .advice-box { background: linear-gradient(135deg, #ffecd2, #fcb69f); padding: 20px; border-radius: 15px; white-space: pre-line; line-height: 1.8; }
+        .tech-stack { text-align: center; color: white; padding: 20px; opacity: 0.8; margin-top: 20px; }
+        .verification-note { background: #667eea; color: white; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👗 Fashion RAG - Dual Database</h1>
+        
+        <div class="card">
+            <h2>📝 Your Profile</h2>
+            <form id="fashionForm">
+                <div class="form-grid">
+                    <div class="form-group"><label>Age</label><input type="text" id="age" value="41 years old"></div>
+                    <div class="form-group"><label>Identity</label><input type="text" id="identity" value="SDE"></div>
+                    <div class="form-group"><label>Family</label><input type="text" id="family" value="married, not kids, 2 cats"></div>
+                    <div class="form-group"><label>Occasion</label>
+                        <select id="occasion">
+                            <option value="Party" selected>Party</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Work">Work</option>
+                            <option value="Daily">Daily</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Theme</label><input type="text" id="theme" value="None"></div>
+                    <div class="form-group"><label>Style</label>
+                        <select id="style">
+                            <option value="Trendy" selected>Trendy</option>
+                            <option value="Elegant">Elegant</option>
+                            <option value="Minimal">Minimal</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width"><label>Special Needs</label><textarea id="special_needs" rows="2">Art charity event</textarea></div>
+                </div>
+                <button type="submit" class="btn">✨ Get Recommendations</button>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>🔍 Searching Fashionpedia (outfits)...</p>
+            <p>🛍️ Searching DeepFashion2 (items)...</p>
+            <p>🤖 Generating advice...</p>
+        </div>
+        
+        <div class="result-section" id="result">
+            <div class="verification-note">
+                ✅ Dual Database: Fashionpedia (outfits) + DeepFashion2 (items) - No contradictions!
+            </div>
+            
+            <div class="card">
+                <h2>👤 Your Profile</h2>
+                <div class="profile-tags" id="profileDisplay"></div>
+            </div>
+            
+            <div class="card">
+                <h2>📊 AI Analysis</h2>
+                <div id="analysisDisplay"></div>
+            </div>
+            
+            <div class="db-section fashionpedia">
+                <div class="db-header">
+                    <span class="db-icon">👗</span>
+                    <div>
+                        <div class="db-title">Fashionpedia</div>
+                        <div class="db-desc">Best for: Dresses, full outfits, elegant styles</div>
+                    </div>
+                </div>
+                <div class="gallery" id="fashionpediaGallery"></div>
+            </div>
+            
+            <div class="db-section deepfashion2">
+                <div class="db-header">
+                    <span class="db-icon">👠</span>
+                    <div>
+                        <div class="db-title">DeepFashion2</div>
+                        <div class="db-desc">Best for: Shoes, bags, individual items</div>
+                    </div>
+                </div>
+                <div class="gallery" id="deepfashion2Gallery"></div>
+            </div>
+            
+            <div class="card">
+                <h2>💬 Complete Outfit Recommendation</h2>
+                <div class="advice-box" id="adviceDisplay"></div>
+            </div>
+        </div>
+        
+        <div class="tech-stack">
+            🔧 Tech: Fashionpedia + DeepFashion2 + ChromaDB + GPT-3.5
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('fashionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('result').classList.remove('active');
+            
+            const formData = {
+                age: document.getElementById('age').value,
+                identity: document.getElementById('identity').value,
+                family: document.getElementById('family').value,
+                occasion: document.getElementById('occasion').value,
+                theme: document.getElementById('theme').value,
+                style: document.getElementById('style').value,
+                special_needs: document.getElementById('special_needs').value
+            };
+            
+            try {
+                const response = await fetch('/api/recommend', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResults(data.result);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Connection error: ' + error.message);
+            }
+            
+            document.getElementById('loading').classList.remove('active');
+        });
+        
+        function showResults(result) {
+            document.getElementById('result').classList.add('active');
+            
+            // Profile
+            const profileHTML = `
+                <div class="profile-tag"><label>Age</label><span>${result.user_profile.age}</span></div>
+                <div class="profile-tag"><label>Identity</label><span>${result.user_profile.identity}</span></div>
+                <div class="profile-tag"><label>Occasion</label><span>${result.user_profile.occasion}</span></div>
+                <div class="profile-tag"><label>Style</label><span>${result.user_profile.style}</span></div>
+                <div class="profile-tag" style="grid-column: 1 / -1;"><label>Needs</label><span>${result.user_profile.special_needs}</span></div>
+            `;
+            document.getElementById('profileDisplay').innerHTML = profileHTML;
+            
+            // Analysis
+            document.getElementById('analysisDisplay').innerHTML = `<p>${result.analysis}</p>`;
+            
+            // Fashionpedia Gallery
+            const fpItems = result.categorized_results.fashionpedia || [];
+            let fpHTML = '';
+            if (fpItems.length > 0) {
+                fpHTML = '<div class="gallery">';
+                fpItems.forEach((item, i) => {
+                    fpHTML += `
+                        <div class="gallery-item">
+                            <img src="${item.file_path}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><rect fill=%22%23f0f0f0%22 width=%22180%22 height=%22180%22/><text fill=%22%23999%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22>Fashion</text></svg>'">
+                            <div class="info"><h4>Outfit ${i+1}</h4><p>${item.description.substring(0, 50)}...</p></div>
+                        </div>`;
+                });
+                fpHTML += '</div>';
+            } else {
+                fpHTML = '<p>No matching outfits found in Fashionpedia</p>';
+            }
+            document.getElementById('fashionpediaGallery').innerHTML = fpHTML;
+            
+            // DeepFashion2 Gallery
+            const df2Items = result.categorized_results.deepfashion2 || [];
+            let df2HTML = '';
+            if (df2Items.length > 0) {
+                df2HTML = '<div class="gallery">';
+                df2Items.forEach((item, i) => {
+                    df2HTML += `
+                        <div class="gallery-item">
+                            <img src="${item.file_path}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><rect fill=%22%23f0f0f0%22 width=%22180%22 height=%22180%22/><text fill=%22%23999%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22>Item</text></svg>'">
+                            <div class="info"><h4>Item ${i+1}</h4><p>${item.description.substring(0, 50)}...</p></div>
+                        </div>`;
+                });
+                df2HTML += '</div>';
+            } else {
+                df2HTML = '<p>No matching items found in DeepFashion2 (download required)</p>';
+            }
+            document.getElementById('deepfashion2Gallery').innerHTML = df2HTML;
+            
+            // Advice
+            document.getElementById('adviceDisplay').innerHTML = result.advice;
+            
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

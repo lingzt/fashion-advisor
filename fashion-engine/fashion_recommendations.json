@@ -1,0 +1,174 @@
+[
+  {
+    "outfit_id": "OUTFIT_spring_date",
+    "season": "spring",
+    "occasion": "date",
+    "items": {
+      "top": {
+        "item_id": "T1",
+        "name": "Classic White Tee",
+        "category": "TOP",
+        "color": "WHITE",
+        "color_hex": "#FFFFFF",
+        "formality": 1
+      },
+      "bottom": {
+        "item_id": "B3",
+        "name": "Beige Chinos",
+        "category": "BOTTOM",
+        "color": "BEIGE",
+        "color_hex": "#F5F5DC",
+        "formality": 3
+      },
+      "footwear": {
+        "item_id": "F2",
+        "name": "Brown Loafers",
+        "category": "FOOTWEAR",
+        "color": "BROWN",
+        "color_hex": "#8B4513",
+        "formality": 4
+      },
+      "accessory": {
+        "item_id": "A1",
+        "name": "Silver Necklace",
+        "category": "ACCESSORY",
+        "color": "GRAY",
+        "color_hex": "#808080",
+        "formality": 2
+      }
+    },
+    "colors": [
+      "WHITE",
+      "BEIGE"
+    ]
+  },
+  {
+    "outfit_id": "OUTFIT_summer_casual",
+    "season": "summer",
+    "occasion": "casual",
+    "items": {
+      "top": {
+        "item_id": "T1",
+        "name": "Classic White Tee",
+        "category": "TOP",
+        "color": "WHITE",
+        "color_hex": "#FFFFFF",
+        "formality": 1
+      },
+      "bottom": {
+        "item_id": "B4",
+        "name": "White Linen Pants",
+        "category": "BOTTOM",
+        "color": "WHITE",
+        "color_hex": "#FFFFFF",
+        "formality": 2
+      },
+      "footwear": {
+        "item_id": "F1",
+        "name": "White Sneakers",
+        "category": "FOOTWEAR",
+        "color": "WHITE",
+        "color_hex": "#FFFFFF",
+        "formality": 1
+      },
+      "accessory": {
+        "item_id": "A2",
+        "name": "Leather Belt",
+        "category": "ACCESSORY",
+        "color": "BROWN",
+        "color_hex": "#8B4513",
+        "formality": 3
+      }
+    },
+    "colors": [
+      "WHITE",
+      "WHITE"
+    ]
+  },
+  {
+    "outfit_id": "OUTFIT_fall_work",
+    "season": "fall",
+    "occasion": "work",
+    "items": {
+      "top": {
+        "item_id": "T2",
+        "name": "Navy Oxford Shirt",
+        "category": "TOP",
+        "color": "NAVY",
+        "color_hex": "#000080",
+        "formality": 4
+      },
+      "bottom": {
+        "item_id": "B2",
+        "name": "Black Dress Pants",
+        "category": "BOTTOM",
+        "color": "BLACK",
+        "color_hex": "#000000",
+        "formality": 5
+      },
+      "footwear": {
+        "item_id": "F2",
+        "name": "Brown Loafers",
+        "category": "FOOTWEAR",
+        "color": "BROWN",
+        "color_hex": "#8B4513",
+        "formality": 4
+      },
+      "accessory": {
+        "item_id": "A2",
+        "name": "Leather Belt",
+        "category": "ACCESSORY",
+        "color": "BROWN",
+        "color_hex": "#8B4513",
+        "formality": 3
+      }
+    },
+    "colors": [
+      "NAVY",
+      "BLACK"
+    ]
+  },
+  {
+    "outfit_id": "OUTFIT_winter_party",
+    "season": "winter",
+    "occasion": "party",
+    "items": {
+      "top": {
+        "item_id": "T4",
+        "name": "Black Jacket",
+        "category": "TOP",
+        "color": "BLACK",
+        "color_hex": "#000000",
+        "formality": 3
+      },
+      "bottom": {
+        "item_id": "B1",
+        "name": "Blue Jeans",
+        "category": "BOTTOM",
+        "color": "BLUE",
+        "color_hex": "#0000FF",
+        "formality": 2
+      },
+      "footwear": {
+        "item_id": "F1",
+        "name": "White Sneakers",
+        "category": "FOOTWEAR",
+        "color": "WHITE",
+        "color_hex": "#FFFFFF",
+        "formality": 1
+      },
+      "accessory": {
+        "item_id": "A1",
+        "name": "Silver Necklace",
+        "category": "ACCESSORY",
+        "color": "GRAY",
+        "color_hex": "#808080",
+        "formality": 2
+      }
+    },
+    "colors": [
+      "BLACK",
+      "BLUE"
+    ]
+  }
+]

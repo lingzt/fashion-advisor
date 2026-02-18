@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👗 Fashion Stylist - Chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 700px;
+            overflow: hidden;
+            margin-bottom: 320px; /* Space for debug panel */
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .chat-header h1 { font-size: 1.5rem; margin-bottom: 5px; }
+        .chat-header p { opacity: 0.8; font-size: 0.9rem; }
+        
+        .chat-messages {
+            height: 450px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: 20%;
+            border-bottom-right-radius: 3px;
+        }
+        
+        .message.bot {
+            background: white;
+            color: #333;
+            margin-right: 20%;
+            border-bottom-left-radius: 3px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .message.loading {
+            background: #e9ecef;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .message .advice {
+            margin-bottom: 15px;
+        }
+        
+        .message .images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .message .images .image-item {
+            position: relative;
+        }
+        
+        .message .images img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .message .images img:hover {
+            transform: scale(1.05);
+        }
+        
+        .match-badge {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            right: 5px;
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .match-badge.perfect {
+            background: rgba(0, 200, 0, 0.9);
+            color: white;
+        }
+        
+        .match-badge.partial {
+            background: rgba(255, 200, 0, 0.9);
+            color: #333;
+        }
+        
+        .match-badge.relaxed {
+            background: rgba(100, 200, 100, 0.9);
+            color: white;
+        }
+        
+        .match-badge.poor {
+            background: rgba(255, 100, 100, 0.9);
+            color: white;
+        }
+        
+        .match-reasons {
+            font-size: 9px;
+            color: #666;
+            margin-top: 2px;
+            text-align: center;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            line-height: 1.3;
+            padding: 2px 4px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input input:focus {
+            border-color: #667eea;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .chat-input button:hover { transform: scale(1.05); }
+        .chat-input button:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .lightbox.active { display: flex; }
+        
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+        }
+        
+        .lightbox .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
+        
+        /* Debug Panel - Fixed at bottom of screen */
+        .debug-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            color: #00ff88;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border-top: 3px solid #00ff88;
+            z-index: 999;
+        }
+        
+        .debug-panel h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            position: sticky;
+            top: 0;
+            background: #1a1a2e;
+            padding-bottom: 10px;
+        }
+        
+        .debug-panel h3 {
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .debug-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #16213e;
+            border-radius: 10px;
+        }
+        
+        .debug-section h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .debug-section pre {
+            background: #0f0f23;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            color: #00ff88;
+        }
+        
+        .debug-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        
+        .debug-img {
+            text-align: center;
+        }
+        
+        .debug-img img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #00ff88;
+        }
+        
+        .debug-img span {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>👗 Fashion Stylist</h1>
+            <p>Ask me for outfit recommendations!</p>
+        </div>
+        <div class="chat-messages" id="messages">
+            <div class="message bot">
+                👋 Hi! I'm your personal fashion stylist.<br><br>
+                Just tell me what you need, for example:<br>
+                • "What should I wear for a casual spring day?"<br>
+                • "I need an outfit for a date night"<br>
+                • "Suggest a business formal look for winter"<br>
+                • "Create a trendy autumn outfit"<br><br>
+                Try it now! ✨
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Describe what you need..." autofocus>
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+    <!-- Lightbox for images -->
+    <div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
+        <span class="close">&times;</span>
+        <img id="lightboxImg" src="">
+    </div>
+
+    <!-- Debug Panel - Fixed at bottom -->
+    <div class="debug-panel" id="debugInfo">
+        <h3>🔍 Debug Info</h3>
+        <p style="color: #888;">Send a message to see debug info...</p>
+    </div>
+
+    <script>
+        const messagesDiv = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        // Parse natural language to API params
+        function parseUserInput(text) {
+            const lower = text.toLowerCase();
+            const params = { style: "modern" };
+            
+            // Occasion
+            if (lower.includes("date") || lower.includes("dating") || lower.includes("romantic")) {
+                params.occasion = "date";
+            } else if (lower.includes("business") || lower.includes("work") || lower.includes("office") || lower.includes("meeting")) {
+                params.occasion = "business";
+            } else if (lower.includes("formal") || lower.includes("wedding") || lower.includes("event")) {
+                params.occasion = "formal";
+            } else if (lower.includes("party") || lower.includes("night") || lower.includes("club")) {
+                params.occasion = "party";
+            } else if (lower.includes("sport") || lower.includes("gym") || lower.includes("workout") || lower.includes("exercise")) {
+                params.occasion = "sport";
+            } else {
+                params.occasion = "casual";
+            }
+            
+            // Season
+            if (lower.includes("summer") || lower.includes("hot") || lower.includes("beach")) {
+                params.season = "summer";
+            } else if (lower.includes("fall") || lower.includes("autumn") || lower.includes("cool")) {
+                params.season = "fall";
+            } else if (lower.includes("winter") || lower.includes("cold") || lower.includes("snow")) {
+                params.season = "winter";
+            } else if (lower.includes("spring") || lower.includes("warm") || lower.includes("flower")) {
+                params.season = "spring";
+            } else {
+                params.season = "spring"; // default
+            }
+            
+            // Style
+            if (lower.includes("classic") || lower.includes("traditional") || lower.includes("timeless")) {
+                params.style = "classic";
+            } else if (lower.includes("edgy") || lower.includes("punk") || lower.includes("rock")) {
+                params.style = "edgy";
+            } else if (lower.includes("boho") || lower.includes("bohemian") || lower.includes("hippie")) {
+                params.style = "bohemian";
+            } else if (lower.includes("elegant") || lower.includes("sophisticated") || lower.includes("luxury")) {
+                params.style = "elegant";
+            } else if (lower.includes("street") || lower.includes("trendy") || lower.includes("cool")) {
+                params.style = "trendy";
+            } else if (lower.includes("minimal") || lower.includes("simple") || lower.includes("clean")) {
+                params.style = "minimalist";
+            } else {
+                params.style = "modern";
+            }
+            
+            return params;
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function addMessage(text, isUser, images = []) {
+            const div = document.createElement('div');
+            div.className = 'message ' + (isUser ? 'user' : 'bot');
+            
+            if (images.length > 0) {
+                // Has images - format as advice + images
+                let html = '<div class="advice">' + text.replace(/\n/g, '<br>') + '</div>';
+                html += '<div class="images">';
+                images.forEach(img => {
+                    const matchLabel = img.match_label || '';
+                    const matchReasons = img.match_reasons || '';
+                    html += `<div class="image-item">
+                        <img src="/${img.file_path}" onclick="showLightbox('/${img.file_path}')" alt="${img.description}">
+                        <span class="match-badge ${img.match_level || ''}">${matchLabel}</span>
+                        ${matchReasons ? `<span class="match-reasons">${matchReasons}</span>` : ''}
+                    </div>`;
+                });
+                html += '</div>';
+                div.innerHTML = html;
+            } else {
+                div.innerHTML = text.replace(/\n/g, '<br>');
+            }
+            
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function showLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, true);
+            userInput.value = '';
+            sendBtn.disabled = true;
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message loading';
+            loadingDiv.textContent = 'Thinking...';
+            messagesDiv.appendChild(loadingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            try {
+                // Send raw user input - backend will use LLM to parse
+                const params = { identity: text };  // Send raw text as identity
+                
+                const res = await fetch('/api/recommend', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(params)
+                });
+                const data = await res.json();
+                loadingDiv.remove();
+                
+                if (data.success) {
+                    addMessage(data.result.advice, false, data.result.images || []);
+                    
+                    // Show debug info at bottom
+                    showDebugInfo(data.result);
+                } else {
+                    addMessage('Error: ' + data.error, false);
+                }
+            } catch (err) {
+                loadingDiv.remove();
+                addMessage('Error: ' + err.message, false);
+            }
+
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+        
+        function showDebugInfo(result) {
+            const debugDiv = document.getElementById('debugInfo');
+            if (!debugDiv) return;
+            
+            if (!result) {
+                debugDiv.innerHTML = '<h3>🔍 Debug Info</h3><p style="color: #888;">No debug info available.</p>';
+                return;
+            }
+            
+            let debugHTML = '<h3>🔍 Debug Info</h3>';
+            
+            // Show parsed query
+            debugHTML += '<div class="debug-section">';
+            debugHTML += '<h4>📝 Parsed User Request:</h4>';
+            debugHTML += '<pre>' + JSON.stringify({
+                query: result.query || '',
+                images_found: result.images?.length || 0
+            }, null, 2) + '</pre>';
+            debugHTML += '</div>';
+            
+            // Show retrieved images
+            if (result.images && result.images.length > 0) {
+                debugHTML += '<div class="debug-section">';
+                debugHTML += '<h4>🖼️ Retrieved Images:</h4>';
+                debugHTML += '<div class="debug-images">';
+                result.images.forEach((img, i) => {
+                    debugHTML += `<div class="debug-img">
+                        <img src="/${img.file_path}" alt="img${i+1}">
+                        <span>Image ${i+1}: ${img.image_id}</span>
+                    </div>`;
+                });
+                debugHTML += '</div></div>';
+            }
+            
+            // Show raw query
+            debugHTML += '<div class="debug-section">';
+            debugHTML += '<h4>🔧 Raw Query Sent to RAG:</h4>';
+            debugHTML += '<pre>' + (result.query || '') + '</pre>';
+            debugHTML += '</div>';
+            
+            debugDiv.innerHTML = debugHTML;
+            debugDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

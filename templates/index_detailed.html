@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👗 Fashion Stylist - Category-Based RAG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.active {
+            display: block;
+        }
+        
+        .profile-tags {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .profile-tag {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .profile-tag label {
+            display: block;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .profile-tag span {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .analysis-box {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .analysis-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .category-section {
+            margin-bottom: 30px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .category-icon {
+            font-size: 2em;
+        }
+        
+        .category-title {
+            font-size: 1.5em;
+            color: #333;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .gallery-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .gallery-item .info {
+            padding: 12px;
+        }
+        
+        .gallery-item .info h4 {
+            color: #333;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+        
+        .gallery-item .info p {
+            color: #666;
+            font-size: 0.85em;
+            line-height: 1.4;
+        }
+        
+        .advice-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 25px;
+            border-radius: 15px;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+        
+        .tech-stack {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+        }
+        
+        .no-images {
+            color: #999;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .verification-note {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8em; }
+            .gallery { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👗 Fashion Stylist</h1>
+            <p>Category-Based RAG Recommendation</p>
+        </header>
+        
+        <!-- Input Form -->
+        <div class="card">
+            <h2>📝 Your Profile</h2>
+            <form id="fashionForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="text" id="age" value="41 years old">
+                    </div>
+                    <div class="form-group">
+                        <label>Identity</label>
+                        <input type="text" id="identity" value="SDE">
+                    </div>
+                    <div class="form-group">
+                        <label>Family</label>
+                        <input type="text" id="family" value="married, not kids, 2 cats">
+                    </div>
+                    <div class="form-group">
+                        <label>Occasion</label>
+                        <select id="occasion">
+                            <option value="Wedding" selected>Wedding</option>
+                            <option value="Party">Party</option>
+                            <option value="Work">Work</option>
+                            <option value="Daily">Daily</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Theme</label>
+                        <input type="text" id="theme" value="None">
+                    </div>
+                    <div class="form-group">
+                        <label>Style</label>
+                        <select id="style">
+                            <option value="Elegant" selected>Elegant</option>
+                            <option value="Minimal">Minimal</option>
+                            <option value="Trendy">Trendy</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Special Needs</label>
+                        <textarea id="special_needs" rows="3">The wedding is for Indian and American mix couple. The groom is my neighbor's children. I am Asian and about 5ft tall.</textarea>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">✨ Get Personalized Recommendations</button>
+            </form>
+        </div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>🔍 Analyzing your profile...</p>
+            <p>🖼️ Searching Fashionpedia by category...</p>
+            <p>🤖 Generating styling advice...</p>
+        </div>
+        
+        <!-- Results -->
+        <div class="result-section" id="result">
+            <!-- Verification Note -->
+            <div class="verification-note">
+                ✅ RAG verifies: Each category shown separately - no contradictions (e.g., dress + pants won't appear together)
+            </div>
+            
+            <!-- User Profile -->
+            <div class="card">
+                <h2>👤 Your Profile</h2>
+                <div class="profile-tags" id="profileDisplay"></div>
+            </div>
+            
+            <!-- Analysis -->
+            <div class="card">
+                <h2>📊 AI Analysis</h2>
+                <div class="analysis-box" id="analysisDisplay"></div>
+            </div>
+            
+            <!-- Categorized Results -->
+            <div class="card">
+                <h2>🖼️ Recommended Items by Category</h2>
+                <div id="categorizedResults"></div>
+            </div>
+            
+            <!-- Styling Advice -->
+            <div class="card">
+                <h2>💬 Complete Outfit Recommendation</h2>
+                <div class="advice-box" id="adviceDisplay"></div>
+            </div>
+        </div>
+        
+        <div class="tech-stack">
+            <p>🔧 Tech: Fashionpedia + ChromaDB + GPT-3.5</p>
+        </div>
+    </div>
+    
+    <script>
+        const categoryIcons = {
+            'dress': '👗',
+            'shirt, blouse': '👚',
+            'top, t-shirt, sweatshirt': '👕',
+            'pants': '👖',
+            'jeans': '👖',
+            'skirt': '👘',
+            'shoes': '👠',
+            'bag': '👜',
+            'accessories': '💎',
+            'outerwear': '🧥',
+            'jacket': '🧥',
+            'hat': '👒'
+        };
+        
+        document.getElementById('fashionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('result').classList.remove('active');
+            
+            const formData = {
+                age: document.getElementById('age').value,
+                identity: document.getElementById('identity').value,
+                family: document.getElementById('family').value,
+                occasion: document.getElementById('occasion').value,
+                theme: document.getElementById('theme').value,
+                style: document.getElementById('style').value,
+                special_needs: document.getElementById('special_needs').value
+            };
+            
+            try {
+                const response = await fetch('/api/recommend', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResults(data.result);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Connection error');
+            }
+            
+            document.getElementById('loading').classList.remove('active');
+        });
+        
+        function showResults(result) {
+            document.getElementById('result').classList.add('active');
+            
+            // Profile
+            const profileHTML = `
+                <div class="profile-tag"><label>Age</label><span>${result.user_profile.age}</span></div>
+                <div class="profile-tag"><label>Identity</label><span>${result.user_profile.identity}</span></div>
+                <div class="profile-tag"><label>Family</label><span>${result.user_profile.family}</span></div>
+                <div class="profile-tag"><label>Occasion</label><span>${result.user_profile.occasion}</span></div>
+                <div class="profile-tag"><label>Theme</label><span>${result.user_profile.theme}</span></div>
+                <div class="profile-tag"><label>Style</label><span>${result.user_profile.style}</span></div>
+                <div class="profile-tag" style="grid-column: 1 / -1;"><label>Special Needs</label><span>${result.user_profile.special_needs}</span></div>
+            `;
+            document.getElementById('profileDisplay').innerHTML = profileHTML;
+            
+            // Analysis
+            document.getElementById('analysisDisplay').innerHTML = `<h3>📋 Recommended Categories</h3><p>${result.analysis}</p>`;
+            
+            // Categorized Results
+            let categoriesHTML = '';
+            const categories = result.categorized_results;
+            
+            for (const [category, images] of Object.entries(categories)) {
+                const icon = categoryIcons[category] || '👕';
+                
+                categoriesHTML += `
+                    <div class="category-section">
+                        <div class="category-header">
+                            <span class="category-icon">${icon}</span>
+                            <h3 class="category-title">${category.toUpperCase()}</h3>
+                        </div>
+                `;
+                
+                if (images && images.length > 0) {
+                    categoriesHTML += `<div class="gallery">`;
+                    images.forEach((img, idx) => {
+                        categoriesHTML += `
+                            <div class="gallery-item">
+                                <img src="${img.file_path}" alt="${category}" 
+                                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/><text fill=%22%23999%22 x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22>${category}</text></svg>'">
+                                <div class="info">
+                                    <h4>${category.title()} ${idx + 1}</h4>
+                                    <p>${img.description.substring(0, 80)}...</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    categoriesHTML += `</div>`;
+                } else {
+                    categoriesHTML += `<div class="no-images">No matching images found in this category</div>`;
+                }
+                
+                categoriesHTML += `</div>`;
+            }
+            
+            document.getElementById('categorizedResults').innerHTML = categoriesHTML;
+            
+            // Advice
+            document.getElementById('adviceDisplay').innerHTML = result.advice;
+            
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

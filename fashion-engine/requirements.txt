@@ -1,0 +1,34 @@
+# Fashion Recommendation Engine
+# Requirements
+
+# Core
+python >= 3.9
+
+# OpenAI Integration
+openai >= 1.0.0
+
+# Optional: Image Generation (DALL-E 3)
+# uncomment if using image generation features
+# openai >= 1.0.0
+
+# Data Handling
+pyyaml >= 6.0
+
+# API Framework (optional, for REST API)
+fastapi >= 0.100.0
+uvicorn >= 0.22.0
+pydantic >= 2.0.0
+
+# Vector Search (optional, for scale)
+# pinecone-client >= 2.0.0
+# or
+# qdrant-client >= 1.0.0
+
+# Testing
+pytest >= 7.0.0
+pytest-asyncio >= 0.21.0
+
+# Development
+black >= 23.0.0
+flake8 >= 6.0.0
+mypy >= 1.0.0
