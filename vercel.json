@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/fashion-advisor", "destination": "https://fashion-advisor-8lh7n0wc6-asklingtoby-2864s-projects.vercel.app" },
     { "source": "/(.*)", "destination": "/luna-newyear-dinner.html" }
   ]
 }
